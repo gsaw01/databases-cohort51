@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
 import { createDBQuery, createTablesQueries, insertDataQueries } from './queries.js';
 
-export const dbConfig = {
+const dbConfig = {
   host: 'localhost',
   user: 'hyfuser',
   password: 'hyfpassword',
