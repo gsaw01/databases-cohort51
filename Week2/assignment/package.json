@@ -1,0 +1,17 @@
+{
+  "name": "databases-week2-assignment",
+  "version": "1.0.0",
+  "main": "ex-1.js",
+  "type": "module",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "mysql2": "^3.13.0"
+  }
+}
