@@ -2,7 +2,7 @@ const { MongoClient, ServerApiVersion } = require('mongodb');
 const { seedDatabase } = require('./seedDatabase.js');
 require('dotenv').config();
 
-async function createEpisodeExercise(client) {
+async function createEpisodeExercise(client, collection) {
   /**
    * We forgot to add the last episode of season 9. It has this information:
    *
@@ -41,7 +41,7 @@ async function createEpisodeExercise(client) {
   }
 }
 
-async function findEpisodesExercises(client) {
+async function findEpisodesExercises(client, collection) {
   /**
    * Complete the following exercises.
    * The comments indicate what to do and what the result should be!
@@ -49,16 +49,18 @@ async function findEpisodesExercises(client) {
 
   // Find the title of episode 2 in season 2 [Should be: WINTER SUN]
   try {
-    const result = await collection.findOne({ EPISODE: 'S02E02' });
-    console.log(`The title of episode 2 in season 2 is ${result.TITLE}`);
+    const result = await collection.findOne({ episode: 'S02E02' });
+    console.log(`The title of episode 2 in season 2 is ${result.title}`);
   } catch (error) {
     console.error(`Failed to find episode: ${error}`);
   }
 
   // Find the season and episode number of the episode called "BLACK RIVER" [Should be: S02E06]
   try {
-    const result = await collection.findOne({ TITLE: 'BLACK RIVER' });
-    console.log(`The title of episode 2 in season 2 is ${result.EPISODE}`);
+    const result = await collection.findOne({ title: 'BLACK RIVER' });
+    console.log(
+      `The season and episode number of the "BLACK RIVER" episode is ${result.episode}`
+    );
   } catch (error) {
     console.error(`Failed to find episode: ${error}`);
   }
@@ -66,9 +68,9 @@ async function findEpisodesExercises(client) {
   // Find all of the episode titles where Bob Ross painted a CLIFF [Should be: NIGHT LIGHT, EVENING SEASCAPE, SURF'S UP, CLIFFSIDE, BY THE SEA, DEEP WILDERNESS HOME, CRIMSON TIDE, GRACEFUL WATERFALL]
 
   try {
-    const results = await collection.find({ ELEMENTS: { $in: ['CLIFF'] } }).toArray();
+    const results = await collection.find({ elements: 'CLIFF' }).toArray();
     if (results.length > 0) {
-      const titlesString = results.map((result) => result.TITLE).join(', ');
+      const titlesString = results.map((result) => result.title).join(', ');
       console.log(`The episodes that Bob Ross painted a CLIFF are: ${titlesString}`);
     } else {
       console.log('No episodes found with CLIFF element.');
@@ -81,10 +83,10 @@ async function findEpisodesExercises(client) {
 
   try {
     const results = await collection
-      .find({ ELEMENTS: { $in: ['CLIFF', 'LIGHTHOUSE '] } })
+      .find({ elements: { $all: ['CLIFF', 'LIGHTHOUSE'] } })
       .toArray();
     if (results.length > 0) {
-      const titlesString = results.map((result) => result.TITLE).join(', ');
+      const titlesString = results.map((result) => result.title).join(', ');
       console.log(
         `The episodes that Bob Ross painted a CLIFF and a LIGHTHOUSE are ${titlesString}`
       );
@@ -108,8 +110,8 @@ async function updateEpisodeExercises(client, collection) {
 
   try {
     const updateResult = await collection.updateOne(
-      { EPISODE: 'S30E13' },
-      { $set: { TITLE: 'BLUE RIDGE FALLS' } }
+      { episode: 'S30E13' },
+      { $set: { title: 'BLUE RIDGE FALLS' } }
     );
     console.log(
       `Ran a command to update episode 13 in season 30 and it updated ${updateResult.modifiedCount} episodes`
@@ -124,8 +126,8 @@ async function updateEpisodeExercises(client, collection) {
 
   try {
     const updateResult = await collection.updateMany(
-      { ELEMENTS: 'BUSHES' },
-      { $set: { 'ELEMENTS.$': 'BUSH' } }
+      { elements: 'BUSHES' },
+      { $push: { elements: 'BUSH' } }
     );
     console.log(
       `Ran a command to update all the BUSHES to BUSH and it updated ${updateResult.modifiedCount} episodes`
@@ -142,7 +144,7 @@ async function deleteEpisodeExercise(client, collection) {
    */
 
   try {
-    const deleteResult = await collection.deleteOne({ EPISODE: 'S31E14' });
+    const deleteResult = await collection.deleteOne({ episode: 'S31E14' });
     console.log(
       `Ran a command to delete episode and it deleted ${deleteResult.deletedCount} episodes`
     );
