@@ -28,7 +28,7 @@ Name all the tables and columns that would make a 3NF compliant solution.
 
 1. What columns violate 1NF?
 
-Answer: food_description and food_code columns has multiple values, that's 1NF violation.
+Answer: food_description and food_code columns has multiple values, that's 1NF violation. Also, date format is inconsistent in dinner_date column.
 
 2. What entities do you recognize that could be extracted?
 
