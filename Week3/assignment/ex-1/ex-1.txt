@@ -47,5 +47,5 @@ Answer:
 --> Dinner-Food table as we have many-to-many relationship between dinner and food;
 --> Member-Dinner tble as we have many-to-many relationship between member and dinner;
 
-** Dinner-Food table: dinner_id, food_id
+** Dinner-Food table: dinner_id, food_code
 ** Member-Dinner table: member_id, dinner_id
