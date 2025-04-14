@@ -1,5 +1,16 @@
 import { MongoClient } from 'mongodb';
 import 'dotenv/config';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import csv from 'csvtojson';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const csvFilePath = path.resolve(
+  __dirname,
+  '../../homework/ex1-aggregation/population_pyramid_1950-2022.csv'
+);
 
 const connectToDatabase = async () => {
   const client = new MongoClient(process.env.DB_URL);
@@ -9,6 +20,28 @@ const connectToDatabase = async () => {
     return client;
   } catch (error) {
     console.error(`Failed to connect to database: ${error}`);
+    throw error;
+  }
+};
+
+const importDataFromCSV = async (client, csvFilePath) => {
+  try {
+    const jsonData = await csv().fromFile(csvFilePath);
+    const formattedJsonData = jsonData.map((el) => ({
+      Country: el.Country,
+      Year: Number(el.Year),
+      Age: el.Age,
+      M: Number(el.M),
+      F: Number(el.F),
+    }));
+
+    const db = client.db(process.env.DB_NAME);
+    const collection = db.collection('population');
+
+    await collection.insertMany(formattedJsonData);
+    console.log('Succesfully imported data from CSV file.');
+  } catch (error) {
+    console.error(`Failed to import data from CSV: ${error}`);
     throw error;
   }
 };
@@ -110,9 +143,16 @@ const aggregateContinentData = async (year, ageGroup) => {
 };
 
 const main = async () => {
-  await connectToDatabase();
-  await aggregatePopulation('Italy');
-  await aggregateContinentData(1960, '70-74');
+  const client = await connectToDatabase();
+  try {
+    await importDataFromCSV(client, csvFilePath);
+    await aggregatePopulation('Italy');
+    await aggregateContinentData(1960, '70-74');
+  } catch (error) {
+    console.error(`Error: ${error}`);
+  } finally {
+    await client.close();
+  }
 };
 
 main();
